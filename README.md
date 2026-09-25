@@ -1,5 +1,8 @@
 # CityPulse — Civic Command Center
 
+> **Live dashboard:** https://citypulse-xxxx.onrender.com  <!-- update after first deploy -->
+> **Repository:** https://github.com/yashvardhan2797-eng/CityPluse
+
 CityPulse is a civic intelligence dashboard: it ingests civic data (weather, air quality, transit,
 incidents), normalizes and stores it, visualizes it on an interactive map with KPIs and charts,
 detects statistical anomalies, computes metric correlations, and produces plain-language summaries.
@@ -306,7 +309,32 @@ proxy, including a seeded two-anomaly probe proving graph edge formation and the
 - PostGIS geographic indexing (schema leaves room for it; not required for the demo).
 - Per-neighborhood analytics and multi-city comparisons.
 
-## Deployment (free-tier guidance)
+## Deploying (Render free tier — one service)
+
+The Flask app serves the built React dashboard from `frontend/dist`, so the
+whole platform deploys as **one free web service** (no separate static host,
+no CORS setup, API and dashboard share the origin).
+
+**Option A — blueprint (recommended):**
+1. Push this repo to GitHub (done: <https://github.com/yashvardhan2797-eng/CityPluse>).
+2. On <https://render.com> → **New → Blueprint**, select the repo. Render reads
+   `render.yaml` (Python 3.12, `pip install` + `bash build.sh`, gunicorn start,
+   health check `/api/health`).
+3. In the service → **Environment**, set:
+   - `DATABASE_URL` — Supabase **session pooler** string (`...pooler.supabase.com:5432/postgres?sslmode=require`, password URL-encoded). Leave empty for labeled demo mode.
+   - `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` — public identifiers.
+   - Optional: `OPENAQ_API_KEY`, `TRANSIT_GTFS_RT_URL`, `INCIDENTS_SOCRATA_URL`, `AI_*` — each falls back to labeled demo/deterministic mode.
+4. Deploy. First boot runs the frontend build (~2-3 min). Verify `/api/health`.
+
+**Option B — manual web service:** runtime **Python 3.12**, build
+`pip install -r requirements.txt && bash build.sh`, start
+`gunicorn app:app --workers 2 --threads 4 --timeout 90`, same env vars.
+
+**Free-tier notes:** the service sleeps after ~15 min idle (first request
+afterwards takes ~30-60s); the Supabase free tier pauses after long inactivity
+(wake it from the Supabase dashboard). Upgrade plans to avoid both.
+
+## Previous deployment notes (multi-service alternative)
 
 The stack deploys as two services (verified locally; platform specifics should be re-checked
 against current provider docs before relying on them):
