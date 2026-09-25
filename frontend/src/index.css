@@ -1,0 +1,106 @@
+/* CityPulse global styles: Tailwind layers + Leaflet dark theming */
+@import 'leaflet/dist/leaflet.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(34, 211, 238, 0.08), transparent),
+    #060b18;
+}
+
+/* ---- thin dark scrollbars ---- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #24385c transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #24385c;
+  border-radius: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ---- Leaflet dark command-center theming ---- */
+.leaflet-container {
+  background: #0a1222;
+  font-family: inherit;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: #0d1729;
+  color: #e2e8f0;
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.6);
+}
+.leaflet-popup-content-wrapper {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
+.leaflet-popup-content {
+  margin: 12px 14px;
+  line-height: 1.45;
+}
+.leaflet-popup-close-button {
+  color: #64748b !important;
+}
+
+.leaflet-bar a,
+.leaflet-bar a:hover {
+  background: #0d1729;
+  color: #cbd5e1;
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+.leaflet-bar a:hover {
+  background: #1a2a45;
+}
+
+.leaflet-control-attribution {
+  background: rgba(6, 11, 24, 0.85) !important;
+  color: #64748b !important;
+  font-size: 10px;
+}
+.leaflet-control-attribution a {
+  color: #22d3ee !important;
+}
+
+/* Respect users who prefer reduced motion (skeletons, pulses, flyTo). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Pulsing ring on the focused map marker */
+@keyframes cp-marker-pulse {
+  0% {
+    stroke-opacity: 0.9;
+    stroke-width: 3;
+  }
+  70% {
+    stroke-opacity: 0.15;
+    stroke-width: 12;
+  }
+  100% {
+    stroke-opacity: 0.9;
+    stroke-width: 3;
+  }
+}
+.cp-marker-focus {
+  animation: cp-marker-pulse 1.6s ease-out infinite;
+}

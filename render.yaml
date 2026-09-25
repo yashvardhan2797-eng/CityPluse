@@ -1,0 +1,48 @@
+# Render blueprint — one free web service serving API + dashboard.
+# Deploy: Render -> New -> Blueprint -> pick this repo (render.yaml auto-detected).
+# Set DATABASE_URL (Supabase session-pooler string) in the dashboard; everything
+# else has safe defaults. Leave DATABASE_URL empty to run in labeled demo mode.
+services:
+  - type: web
+    name: citypulse
+    runtime: python
+    plan: free
+    buildCommand: |
+      pip install -r requirements.txt
+      bash build.sh
+    startCommand: gunicorn app:app --workers 2 --threads 4 --timeout 90 --access-logfile - --error-logfile -
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12"
+      - key: FLASK_DEBUG
+        value: "0"
+      - key: PORT
+        value: "10000"
+      - key: CORS_ORIGINS
+        value: "*"                # same-origin serving; widen only if splitting domains
+      # --- Secret / account-specific values: set these in the Render dashboard ---
+      - key: DATABASE_URL
+        sync: false               # Supabase session-pooler URL (sslmode=require)
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      # Optional providers — all fall back to labeled demo data when unset
+      - key: OPENAQ_API_KEY
+        sync: false
+      - key: TRANSIT_GTFS_RT_URL
+        sync: false
+      - key: INCIDENTS_SOCRATA_URL
+        sync: false
+      - key: INCIDENTS_FIELD_MAP
+        sync: false
+      - key: AI_API_KEY
+        sync: false
+      - key: AI_BASE_URL
+        sync: false
+      - key: AI_MODEL
+        sync: false
+      - key: REFRESH_TOKEN
+        sync: false
